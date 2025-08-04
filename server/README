@@ -1,0 +1,213 @@
+# Brev.ly - API de Encurtamento de URLs
+
+API para gerenciar o encurtamento de URL's desenvolvida com TypeScript, Fastify, Drizzle e PostgreSQL.
+
+## Funcionalidades e Regras
+
+- [x] Deve ser possível criar um link
+    - [x] Não deve ser possível criar um link com URL encurtada mal formatada
+    - [x] Não deve ser possível criar um link com URL encurtada já existente
+- [x] Deve ser possível deletar um link
+- [x] Deve ser possível obter a URL original por meio de uma URL encurtada
+- [x] Deve ser possível listar todas as URL's cadastradas
+- [x] Deve ser possível incrementar a quantidade de acessos de um link
+- [x] Deve ser possível exportar os links criados em um CSV
+    - [x] Deve ser possível acessar o CSV por meio de uma CDN (Cloudflare R2)
+    - [x] Deve ser gerado um nome aleatório e único para o arquivo
+    - [x] Deve ser possível realizar a listagem de forma performática
+    - [x] O CSV deve ter campos como, URL original, URL encurtada, contagem de acessos e data de criação.
+
+## Tecnologias Utilizadas
+
+- **TypeScript** - Linguagem de programação
+- **Fastify** - Framework web
+- **Drizzle ORM** - ORM para PostgreSQL
+- **PostgreSQL** - Banco de dados
+- **Cloudflare R2** - Armazenamento de arquivos CSV
+- **Zod** - Validação de dados
+- **Nanoid** - Geração de IDs únicos
+
+## Pré-requisitos
+
+- Node.js 20+
+- pnpm
+- PostgreSQL
+- Conta no Cloudflare R2 (opcional, para exportação CSV)
+
+## Instalação
+
+1. Clone o repositório e navegue para a pasta do servidor:
+```bash
+cd server
+```
+
+2. Instale as dependências:
+```bash
+pnpm install
+```
+
+3. Configure as variáveis de ambiente:
+```bash
+cp .env.example .env
+```
+
+4. Edite o arquivo `.env` com suas configurações:
+```env
+PORT=3333
+DATABASE_URL="postgresql://username:password@localhost:5432/brevly"
+
+# Cloudflare R2 (opcional)
+CLOUDFLARE_ACCOUNT_ID=""
+CLOUDFLARE_ACCESS_KEY_ID=""
+CLOUDFLARE_SECRET_ACCESS_KEY=""
+CLOUDFLARE_BUCKET=""
+CLOUDFLARE_PUBLIC_URL=""
+
+# Ambiente
+NODE_ENV=development
+```
+
+5. Execute as migrations do banco de dados:
+```bash
+pnpm db:migrate
+```
+
+## Scripts Disponíveis
+
+- `pnpm dev` - Inicia o servidor em modo de desenvolvimento
+- `pnpm build` - Compila o projeto TypeScript
+- `pnpm start` - Inicia o servidor em modo de produção
+- `pnpm db:migrate` - Executa as migrations do banco de dados
+- `pnpm db:generate` - Gera novas migrations baseadas no schema
+- `pnpm db:studio` - Abre o Drizzle Studio para visualizar o banco
+- `pnpm test` - Executa os testes
+- `pnpm lint` - Executa o linter
+- `pnpm lint:fix` - Corrige automaticamente os problemas do linter
+
+## Endpoints da API
+
+### Base URL: `http://localhost:3333/api`
+
+#### 1. Criar URL Encurtada
+```http
+POST /urls
+Content-Type: application/json
+
+{
+  "originalUrl": "https://example.com/very-long-url",
+  "shortUrl": "custom" // opcional
+}
+```
+
+#### 2. Redirecionar para URL Original
+```http
+GET /{shortUrl}
+```
+
+#### 3. Obter Informações da URL
+```http
+GET /urls/{shortUrl}
+```
+
+#### 4. Listar URLs
+```http
+GET /urls?page=1&limit=10
+```
+
+#### 5. Deletar URL
+```http
+DELETE /urls/{id}
+```
+
+#### 6. Exportar para CSV
+```http
+GET /urls/export/csv
+```
+
+#### 7. Health Check
+```http
+GET /health
+```
+
+## Estrutura do Projeto
+
+```
+src/
+├── controllers/     # Controladores da API
+├── database/        # Schema e conexão com banco
+├── middlewares/     # Middlewares personalizados
+├── routes/          # Definição das rotas
+├── services/        # Lógica de negócio
+├── types/           # Tipos TypeScript
+├── utils/           # Utilitários
+└── index.ts         # Arquivo principal
+```
+
+## Docker
+
+Para executar com Docker:
+
+1. Construa a imagem:
+```bash
+docker build -t brevly-api .
+```
+
+2. Execute o container:
+```bash
+docker run -p 3333:3333 --env-file .env brevly-api
+```
+
+## Desenvolvimento
+
+1. Inicie o servidor em modo de desenvolvimento:
+```bash
+pnpm dev
+```
+
+2. O servidor estará disponível em `http://localhost:3333`
+
+3. Para visualizar o banco de dados:
+```bash
+pnpm db:studio
+```
+
+## Testes
+
+```bash
+pnpm test
+```
+
+## Linting e Formatação
+
+```bash
+# Verificar problemas
+pnpm lint
+
+# Corrigir automaticamente
+pnpm lint:fix
+```
+
+## Deploy
+
+1. Configure as variáveis de ambiente para produção
+2. Execute o build:
+```bash
+pnpm build
+```
+
+3. Inicie o servidor:
+```bash
+pnpm start
+```
+
+## Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Push para a branch
+5. Abra um Pull Request
+
+## Licença
+
+MIT
